@@ -51,6 +51,20 @@ function fmtMethod(m) {
   return m || '';
 }
 
+const PRODUCT_LABELS = {
+  solar: 'Luminária Solar de Parede',
+  led: 'Luminária LED Sem Fio',
+  'lampada-led': 'Lâmpada LED Solar Max',
+  jardim: 'Luminária Espeto',
+};
+function fmtProduct(addr) {
+  if (!addr) return '';
+  try {
+    const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
+    return PRODUCT_LABELS[a.productType] || (a.upsell ? 'Upsell' : '');
+  } catch { return ''; }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -84,7 +98,7 @@ export default async function handler(req, res) {
 
     const headers = [
       'Data/Hora', 'Nome', 'E-mail', 'CPF', 'Telefone',
-      'Endereço', 'Qtd', 'Cor da Luz', 'Valor', 'Frete (Método)', 'Frete (Valor)',
+      'Endereço', 'Produto', 'Qtd', 'Cor da Luz', 'Valor', 'Frete (Método)', 'Frete (Valor)',
       'Pagamento', 'Status', 'ID Mercado Pago', 'Feito', 'Rastreio'
     ];
 
@@ -95,6 +109,7 @@ export default async function handler(req, res) {
       o.customer_cpf || '',
       o.customer_phone || '',
       fmtAddress(o.customer_address),
+      fmtProduct(o.customer_address),
       o.product_quantity || '',
       o.product_light_color || '',
       fmtPrice(o.total_price),

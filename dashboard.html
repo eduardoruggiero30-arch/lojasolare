@@ -346,6 +346,7 @@
               <th>Cliente</th>
               <th>Telefone</th>
               <th>Endereço</th>
+              <th>Produto</th>
               <th>Qtd</th>
               <th>Cor</th>
               <th>Valor</th>
@@ -357,7 +358,7 @@
             </tr>
           </thead>
           <tbody id="orders-body">
-            <tr class="loading-row"><td colspan="12"><div class="spinner"></div>Carregando...</td></tr>
+            <tr class="loading-row"><td colspan="13"><div class="spinner"></div>Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -446,7 +447,7 @@
 
     if (firstLoad) {
       document.getElementById('orders-body').innerHTML =
-        '<tr class="loading-row"><td colspan="12"><div class="spinner"></div>Carregando...</td></tr>';
+        '<tr class="loading-row"><td colspan="13"><div class="spinner"></div>Carregando...</td></tr>';
     }
 
     try {
@@ -479,7 +480,7 @@
     } catch (e) {
       if (firstLoad) {
         document.getElementById('orders-body').innerHTML =
-          '<tr class="loading-row"><td colspan="12">Erro ao carregar dados.</td></tr>';
+          '<tr class="loading-row"><td colspan="13">Erro ao carregar dados.</td></tr>';
       }
     }
   }
@@ -487,6 +488,18 @@
   // ── Render KPIs ───────────────────────────────────────────────
   function fmt(n) {
     return 'R$ ' + parseFloat(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  const PRODUCT_LABELS = {
+    solar: 'Luminária Solar de Parede',
+    led: 'Luminária LED Sem Fio',
+    'lampada-led': 'Lâmpada LED Solar Max',
+    jardim: 'Luminária Espeto',
+  };
+  function productLabel(addr) {
+    if (!addr) return '—';
+    const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
+    return PRODUCT_LABELS[a.productType] || (a.upsell ? 'Upsell' : '—');
   }
 
   function renderKpis(s, hasFilters) {
@@ -580,7 +593,7 @@
   function renderTable(orders) {
     if (!orders || orders.length === 0) {
       document.getElementById('orders-body').innerHTML =
-        '<tr class="loading-row"><td colspan="12">Nenhum pedido encontrado.</td></tr>';
+        '<tr class="loading-row"><td colspan="13">Nenhum pedido encontrado.</td></tr>';
       return;
     }
 
@@ -594,6 +607,7 @@
         </td>
         <td class="nowrap">${esc(o.customer_phone || '—')}</td>
         <td style="font-size:12px;line-height:1.6">${fmtAddress(o.customer_address)}</td>
+        <td style="font-size:12px;font-weight:600">${esc(productLabel(o.customer_address))}</td>
         <td style="text-align:center;font-weight:700">${o.product_quantity || '—'}</td>
         <td style="font-size:12px">${esc(o.product_light_color || '—')}</td>
         <td class="nowrap price">${fmt(o.total_price)}</td>

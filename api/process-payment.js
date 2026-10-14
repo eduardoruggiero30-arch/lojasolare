@@ -194,7 +194,7 @@ export default async function handler(req, res) {
       customer_email:      customerEmail,
       customer_cpf:        customerCpf,
       customer_phone:      customerPhone,
-      customer_address:    { ...customerAddress, orderBumps: orderBumps || {} },
+      customer_address:    { ...customerAddress, orderBumps: orderBumps || {}, productType: productType || 'solar' },
       product_quantity:    quantity,
       product_light_color: lightColor,
       total_price:         totalPrice,
