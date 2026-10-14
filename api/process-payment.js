@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { notifyPaymentApproved, schedulePostPurchaseEmails } from '../lib/send-notification.js';
 import { sendMetaEvent } from '../lib/meta-capi.js';
 import { sendWhatsApp } from '../lib/whatsapp.js';
-import { expectedOrderTotal } from '../lib/order-pricing.js';
+import { isValidOrderTotal } from '../lib/order-pricing.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -68,16 +68,18 @@ export default async function handler(req, res) {
     if (isNaN(parsedQty) || parsedQty < 1 || parsedQty > 100)
       return res.status(400).json({ error: 'Quantidade inválida.' });
     // O valor vem do navegador, então é conferido contra a tabela de preços do servidor
-    const expectedTotal = expectedOrderTotal({
+    // (o cliente pode comprar o mesmo kit várias vezes via "Quantos kits?")
+    const validTotal = isValidOrderTotal({
       productType:   productType || 'solar',
       quantity:      parsedQty,
       shippingPrice: shippingPrice,
       bumpTotal,
       isPix:         paymentMethodId === 'pix',
+      totalPrice:    parsedTotal,
     });
-    if (expectedTotal === null || Math.abs(parsedTotal - expectedTotal) > 0.01) {
+    if (!validTotal) {
       console.warn('[Preço] Pedido recusado por divergência', {
-        productType, quantity: parsedQty, shippingPrice, paymentMethodId, orderBumps, enviado: parsedTotal, esperado: expectedTotal,
+        productType, quantity: parsedQty, shippingPrice, paymentMethodId, orderBumps, enviado: parsedTotal,
       });
       return res.status(400).json({ error: 'Valor do pedido inválido. Atualize a página e tente novamente.' });
     }
