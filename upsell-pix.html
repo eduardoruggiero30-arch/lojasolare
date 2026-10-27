@@ -314,6 +314,17 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             pixCode = result.qr_code;
+            // Uma conversão por pedido, mesmo se o Pix for gerado de novo após expirar
+            const gadsKey = 'gads_upsell_pix_' + orderId;
+            if (!sessionStorage.getItem(gadsKey)) {
+                sessionStorage.setItem(gadsKey, '1');
+                gtag('event', 'conversion', {
+                    'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                    'value': OFFERS[offer].value,
+                    'currency': 'BRL',
+                    'transaction_id': String(result.id)
+                });
+            }
             document.getElementById('pix-offer-label').innerText = '+2 luminárias no seu pedido por ' + OFFERS[offer].price;
             document.getElementById('pix-code').innerText = pixCode;
             document.getElementById('qr-img').src = result.qr_code_base64
@@ -343,13 +354,7 @@
                     const data = await res.json();
                     if (data.status === 'approved') {
                         stopPix();
-                        gtag('event', 'conversion', {
-                            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
-                            'value': OFFERS[offer].value,
-                            'currency': 'BRL',
-                            'transaction_id': String(result.id)
-                        });
-                        setTimeout(function() { window.location.href = 'obrigado.html?status=approved&upsell=true'; }, 1000);
+                        window.location.href = 'obrigado.html?status=approved&upsell=true';
                     }
                 } catch (e) {
                     console.error('Erro polling:', e);

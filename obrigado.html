@@ -183,6 +183,12 @@
             if (typeof ttq !== 'undefined') {
                 ttq.track('Purchase', { contents: [{ content_id: 'solare-luminaria', content_type: 'product', content_name: 'Luminária Solar Solare' }], value: orderTotal, currency: 'BRL' });
             }
+            gtag('event', 'conversion', {
+                'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                'value': orderTotal,
+                'currency': 'BRL',
+                'transaction_id': String(paymentId)
+            });
         }
     }
     // Cartão: NÃO dispara aqui — já foi disparado em checkout.html antes do redirect
@@ -257,16 +263,6 @@
 
                 if (data.status === 'approved') {
                     clearInterval(interval);
-                    const gadsKey = 'gads_purchase_' + id;
-                    if (!sessionStorage.getItem(gadsKey)) {
-                        sessionStorage.setItem(gadsKey, '1');
-                        gtag('event', 'conversion', {
-                            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
-                            'value': orderTotal,
-                            'currency': 'BRL',
-                            'transaction_id': String(id)
-                        });
-                    }
                     if (shouldOfferUpsell()) {
                         goToPixUpsell();
                     } else {
