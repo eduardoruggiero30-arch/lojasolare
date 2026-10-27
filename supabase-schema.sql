@@ -50,8 +50,5 @@ CREATE INDEX IF NOT EXISTS idx_orders_customer_email   ON orders (customer_email
 -- Enable Row Level Security
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
--- Service role (backend) can do everything
-CREATE POLICY "Service role full access"
-  ON orders
-  USING (true)
-  WITH CHECK (true);
+-- Sem policies: só o service role (backend), que ignora RLS, acessa a tabela.
+-- Uma policy USING (true) liberaria leitura e escrita também para a chave anon.

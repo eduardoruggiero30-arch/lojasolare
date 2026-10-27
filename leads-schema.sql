@@ -17,4 +17,4 @@ CREATE INDEX IF NOT EXISTS idx_leads_converted ON leads (converted);
 CREATE INDEX IF NOT EXISTS idx_leads_last_seen ON leads (last_seen);
 
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Service role full access" ON leads USING (true) WITH CHECK (true);
+-- Sem policies: só o service role (backend), que ignora RLS, acessa a tabela.
