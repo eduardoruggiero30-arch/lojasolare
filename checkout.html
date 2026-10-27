@@ -2,19 +2,6 @@
 <html lang="pt-BR">
 <head>
 <script>(function addScript() { var script = document.createElement("script"); script.src = "https://planweb.app/scripts/dist/stories-videos.js?licenseId=21539"; script.type = "text/javascript"; script.async = true; script.charset = "UTF-8"; document.head.appendChild(script); })();</script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17714329725"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-17714329725');
-      gtag('event', 'conversion', {
-          'send_to': 'AW-17714329725/9nnICKPw6pwcEP3w7P5B',
-          'value': 1.0,
-          'currency': 'BRL'
-      });
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Finalizar Compra — Solare</title>
@@ -1699,13 +1686,6 @@
                 const dest = (result.orderId && productType === 'solar')
                     ? `/upsell-v2.html?orderId=${result.orderId}`
                     : `/obrigado.html?id=${result.id}&type=card&total=${total}`;
-                gtag('event', 'conversion', {
-                    'send_to': 'AW-17714329725/033BCIzz6JwcEP3w7P5B',
-                    'value': total,
-                    'currency': 'BRL',
-                    'transaction_id': result.paymentId || '',
-                    'event_callback': function() { window.location.href = dest; }
-                });
                 setTimeout(function() { window.location.href = dest; }, 1500);
             } else {
                 const reason = result.error || 'Verifique os dados ou o limite do cartão.';
