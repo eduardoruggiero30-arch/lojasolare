@@ -314,17 +314,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             pixCode = result.qr_code;
-            // Uma conversão por pedido, mesmo se o Pix for gerado de novo após expirar
-            const gadsKey = 'gads_upsell_pix_' + orderId;
-            if (!sessionStorage.getItem(gadsKey)) {
-                sessionStorage.setItem(gadsKey, '1');
-                gtag('event', 'conversion', {
-                    'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
-                    'value': OFFERS[offer].value,
-                    'currency': 'BRL',
-                    'transaction_id': String(result.id)
-                });
-            }
+            // Dispara sempre ao exibir o Pix; transaction_id por pedido faz o Google contar uma vez só, mesmo se o Pix for gerado de novo
+            gtag('event', 'conversion', {
+                'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                'value': OFFERS[offer].value,
+                'currency': 'BRL',
+                'transaction_id': 'upsell-' + orderId
+            });
             document.getElementById('pix-offer-label').innerText = '+2 luminárias no seu pedido por ' + OFFERS[offer].price;
             document.getElementById('pix-code').innerText = pixCode;
             document.getElementById('qr-img').src = result.qr_code_base64

@@ -172,6 +172,13 @@
 
     // Pix: QR Code gerado — dispara apenas UMA vez por payment_id (evita redisparo em refresh)
     if (type === 'pix' && status === 'pending' && paymentId) {
+        // Google Ads: dispara sempre ao abrir o Pix; o próprio Google descarta repetições pelo transaction_id
+        gtag('event', 'conversion', {
+            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+            'value': orderTotal,
+            'currency': 'BRL',
+            'transaction_id': String(paymentId)
+        });
         const pixKey = 'px_fired_' + paymentId;
         if (!sessionStorage.getItem(pixKey)) {
             sessionStorage.setItem(pixKey, '1');
@@ -183,12 +190,6 @@
             if (typeof ttq !== 'undefined') {
                 ttq.track('Purchase', { contents: [{ content_id: 'solare-luminaria', content_type: 'product', content_name: 'Luminária Solar Solare' }], value: orderTotal, currency: 'BRL' });
             }
-            gtag('event', 'conversion', {
-                'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
-                'value': orderTotal,
-                'currency': 'BRL',
-                'transaction_id': String(paymentId)
-            });
         }
     }
     // Cartão: NÃO dispara aqui — já foi disparado em checkout.html antes do redirect
