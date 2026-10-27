@@ -227,8 +227,8 @@
         const params = new URLSearchParams(window.location.search);
         const orderId = params.get('orderId');
         const OFFERS = {
-            upsell:   { price: 'R$ 49,90' },
-            downsell: { price: 'R$ 39,90' },
+            upsell:   { price: 'R$ 49,90', value: 49.90 },
+            downsell: { price: 'R$ 39,90', value: 39.90 },
         };
 
         const upsellCard   = document.getElementById('offer-upsell');
@@ -343,7 +343,13 @@
                     const data = await res.json();
                     if (data.status === 'approved') {
                         stopPix();
-                        window.location.href = 'obrigado.html?status=approved&upsell=true';
+                        gtag('event', 'conversion', {
+                            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                            'value': OFFERS[offer].value,
+                            'currency': 'BRL',
+                            'transaction_id': String(result.id)
+                        });
+                        setTimeout(function() { window.location.href = 'obrigado.html?status=approved&upsell=true'; }, 1000);
                     }
                 } catch (e) {
                     console.error('Erro polling:', e);

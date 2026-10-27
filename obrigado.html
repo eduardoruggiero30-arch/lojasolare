@@ -257,6 +257,16 @@
 
                 if (data.status === 'approved') {
                     clearInterval(interval);
+                    const gadsKey = 'gads_purchase_' + id;
+                    if (!sessionStorage.getItem(gadsKey)) {
+                        sessionStorage.setItem(gadsKey, '1');
+                        gtag('event', 'conversion', {
+                            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                            'value': orderTotal,
+                            'currency': 'BRL',
+                            'transaction_id': String(id)
+                        });
+                    }
                     if (shouldOfferUpsell()) {
                         goToPixUpsell();
                     } else {

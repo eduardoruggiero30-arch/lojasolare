@@ -1699,6 +1699,12 @@
                 if (typeof ttq !== 'undefined') {
                     ttq.track('Purchase',{contents:[{content_id:'solare-luminaria',content_type:'product',content_name:'Luminária Solar Solare'}],value:total,currency:'BRL'});
                 }
+                gtag('event', 'conversion', {
+                    'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                    'value': total,
+                    'currency': 'BRL',
+                    'transaction_id': String(result.id || '')
+                });
                 // Upsell é exclusivo do produto da home (Luminária Solar)
                 const dest = (result.orderId && productType === 'solar')
                     ? `/upsell-v2.html?orderId=${result.orderId}`

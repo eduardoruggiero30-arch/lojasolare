@@ -209,6 +209,7 @@
         }
 
         let pendingOffer = 'upsell';
+        const UPSELL_VALUES = { upsell: 49.90, downsell: 39.90 };
 
         function submitCvv() {
             const value = document.getElementById('cvv-input').value.replace(/\D/g, '');
@@ -244,7 +245,15 @@
                 }
 
                 if (result.success) {
-                    window.location.href = 'obrigado.html?status=approved&upsell=true';
+                    if (result.status === 'approved') {
+                        gtag('event', 'conversion', {
+                            'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
+                            'value': UPSELL_VALUES[offer],
+                            'currency': 'BRL',
+                            'transaction_id': String(result.id || '')
+                        });
+                    }
+                    setTimeout(function() { window.location.href = 'obrigado.html?status=approved&upsell=true'; }, 1000);
                 } else {
                     console.error('Upsell failed:', result);
                     window.location.href = 'obrigado.html?status=approved&upsell=failed';
