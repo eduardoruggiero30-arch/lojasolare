@@ -1207,6 +1207,37 @@
     let selectedShippingPrice = 0;
     let selectedShippingName = 'Envio Regular (Grátis)';
 
+    // ── GOOGLE ADS: eventos de e-commerce ─────────────────
+    const GA_ITEM_IDS = { solar: 'solare-luminaria', led: 'solare-luminaria-led', 'lampada-led': 'solare-lampada-led', jardim: 'solare-jardim' };
+    function gaItems() {
+        return [{ item_id: GA_ITEM_IDS[productType] || 'solare-luminaria', item_name: productName, price: price, quantity: 1, google_business_vertical: 'retail' }];
+    }
+    function gaTrack(event, params) {
+        if (typeof gtag === 'function') gtag('event', event, Object.assign({ currency: 'BRL', items: gaItems() }, params));
+    }
+    // Dados do cliente para conversões otimizadas; guardados na sessão para a página do Pix
+    function gaSetUserData() {
+        const val = id => (document.getElementById(id)?.value || '').trim();
+        const phone = val('cust-phone').replace(/\D/g, '');
+        const nameParts = val('cust-name').split(/\s+/).filter(Boolean);
+        const userData = {};
+        if (val('cust-email')) userData.email = val('cust-email').toLowerCase();
+        if (phone) userData.phone_number = '+55' + phone;
+        if (nameParts.length || val('addr-cep')) {
+            userData.address = {
+                first_name: nameParts[0] || '',
+                last_name: nameParts.slice(1).join(' '),
+                city: val('addr-city'),
+                region: val('addr-state'),
+                postal_code: val('addr-cep').replace(/\D/g, ''),
+                country: 'BR',
+            };
+        }
+        if (typeof gtag === 'function') gtag('set', 'user_data', userData);
+        try { sessionStorage.setItem('gads_user_data', JSON.stringify(userData)); } catch (e) {}
+    }
+    gaTrack('begin_checkout', { value: price });
+
     // ── ORDER BUMPS ───────────────────────────────────────
     const BUMP_CONFIG = productType === 'led'
         ? { name: 'Leve +3 Luminárias LED', desc: 'Leve mais 3 unidades com desconto exclusivo', price: 59.90 }
@@ -1458,6 +1489,9 @@
             document.getElementById('txt-sum-eta-3').textContent = etaMap[selectedShippingName] || selectedShippingName;
         }
 
+        if (n === 1 || n === 2) gaSetUserData();
+        if (n === 3) gaTrack('add_shipping_info', { value: price + selectedShippingPrice, shipping_tier: selectedShippingName });
+
         // Mark step n done
         document.getElementById(`content-${n}`).classList.remove('active');
         document.getElementById(`head-${n}`).classList.remove('active');
@@ -1598,6 +1632,8 @@
             alert('Verifique os dados dos passos anteriores.');
             return;
         }
+        gaSetUserData();
+        gaTrack('add_payment_info', { value: price + selectedShippingPrice + getBumpTotal(), payment_type: 'card' });
 
         const number = document.getElementById('card-number').value.replace(/\s/g, '');
         const expiry = document.getElementById('card-expiry').value;
@@ -1705,6 +1741,7 @@
                     'currency': 'BRL',
                     'transaction_id': String(result.id || '')
                 });
+                gaTrack('purchase', { transaction_id: String(result.id || ''), value: total, shipping: selectedShippingPrice });
                 // Upsell é exclusivo do produto da home (Luminária Solar)
                 const dest = (result.orderId && productType === 'solar')
                     ? `/upsell-v2.html?orderId=${result.orderId}`
@@ -1726,6 +1763,8 @@
     // ── PIX PAYMENT ───────────────────────────────────────
     async function payWithPix() {
         if (!validateStep1() || !validateStep2()) return;
+        gaSetUserData();
+        gaTrack('add_payment_info', { value: Math.round(((price + selectedShippingPrice) * 0.95 + getBumpTotal()) * 100) / 100, payment_type: 'pix' });
         document.getElementById('loading-overlay').classList.add('active');
         try {
             // Initialise MP SDK so the device fingerprint is captured even for Pix

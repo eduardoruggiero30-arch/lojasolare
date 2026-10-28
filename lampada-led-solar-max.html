@@ -18,6 +18,9 @@
       'currency': 'BRL'
   });
 </script>
+<script>
+  gtag('event', 'view_item', { currency: 'BRL', value: 87.90, items: [{ item_id: 'solare-lampada-led', item_name: 'Lâmpada LED Solar Max', price: 87.90, quantity: 1, google_business_vertical: 'retail' }] });
+</script>
 <script>(function addScript() { var script = document.createElement("script"); script.src = "https://planweb.app/scripts/dist/stories-videos.js?licenseId=21539"; script.type = "text/javascript"; script.async = true; script.charset = "UTF-8"; document.head.appendChild(script); })();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -833,7 +836,7 @@
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-    <script src="script.js?v=1.9" defer></script>
+    <script src="script.js?v=2.0" defer></script>
     <script>
     window.addEventListener('DOMContentLoaded', function() {
         // Override kit defaults — script.js initializes qty=2/price=78.90; this product is different
@@ -852,6 +855,9 @@
 
         // Override handleCheckout to pass the correct product identity to checkout
         window.handleCheckout = function() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'add_to_cart', { currency: 'BRL', value: window.currentSelectedPrice, items: [{ item_id: 'solare-lampada-led', item_name: 'Lâmpada LED Solar Max', price: window.currentSelectedPrice, quantity: 1, google_business_vertical: 'retail' }] });
+            }
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'AddToCart', {
                     content_name: 'Lâmpada LED Solar Max',

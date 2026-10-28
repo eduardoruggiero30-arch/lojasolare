@@ -246,11 +246,21 @@
 
                 if (result.success) {
                     if (result.status === 'approved') {
+                        try {
+                            const userData = JSON.parse(sessionStorage.getItem('gads_user_data') || 'null');
+                            if (userData) gtag('set', 'user_data', userData);
+                        } catch (e) {}
                         gtag('event', 'conversion', {
                             'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
                             'value': UPSELL_VALUES[offer],
                             'currency': 'BRL',
                             'transaction_id': String(result.id || '')
+                        });
+                        gtag('event', 'purchase', {
+                            transaction_id: String(result.id || ''),
+                            value: UPSELL_VALUES[offer],
+                            currency: 'BRL',
+                            items: [{ item_id: 'solare-luminaria-' + offer, item_name: '+2 Luminárias Solares (' + offer + ')', price: UPSELL_VALUES[offer], quantity: 1, google_business_vertical: 'retail' }]
                         });
                     }
                     setTimeout(function() { window.location.href = 'obrigado.html?status=approved&upsell=true'; }, 1000);

@@ -173,11 +173,23 @@
     // Pix: QR Code gerado — dispara apenas UMA vez por payment_id (evita redisparo em refresh)
     if (type === 'pix' && status === 'pending' && paymentId) {
         // Google Ads: dispara sempre ao abrir o Pix; o próprio Google descarta repetições pelo transaction_id
+        try {
+            const userData = JSON.parse(sessionStorage.getItem('gads_user_data') || 'null');
+            if (userData) gtag('set', 'user_data', userData);
+        } catch (e) {}
         gtag('event', 'conversion', {
             'send_to': 'AW-18541177493/9wj1CLnng6wdEJXVj4lF',
             'value': orderTotal,
             'currency': 'BRL',
             'transaction_id': String(paymentId)
+        });
+        const GA_ITEMS = { solar: ['solare-luminaria', 'Luminária Solar Solare'], led: ['solare-luminaria-led', 'Luminária LED Sem Fio Solare'], 'lampada-led': ['solare-lampada-led', 'Lâmpada LED Solar Max'], jardim: ['solare-jardim', 'Luminária Solar Externa de Jardim'] };
+        const gaItem = GA_ITEMS[productType] || GA_ITEMS.solar;
+        gtag('event', 'purchase', {
+            transaction_id: String(paymentId),
+            value: orderTotal,
+            currency: 'BRL',
+            items: [{ item_id: gaItem[0], item_name: gaItem[1], price: orderTotal, quantity: 1, google_business_vertical: 'retail' }]
         });
         const pixKey = 'px_fired_' + paymentId;
         if (!sessionStorage.getItem(pixKey)) {

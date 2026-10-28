@@ -18,6 +18,9 @@
       'currency': 'BRL'
   });
 </script>
+<script>
+  gtag('event', 'view_item', { currency: 'BRL', value: 79.90, items: [{ item_id: 'solare-luminaria-led', item_name: 'Luminária LED Sem Fio Solare', price: 79.90, quantity: 1, google_business_vertical: 'retail' }] });
+</script>
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','878359704804021');fbq('track','PageView');fbq('track','ViewContent',{content_name:'Kit Luminária LED Sem Fio com Controle Remoto',content_category:'Iluminação LED',content_ids:['solare-luminaria-led'],content_type:'product',value:79.90,currency:'BRL'});</script>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=878359704804021&ev=PageView&noscript=1"/></noscript>
     <!-- TikTok Pixel Code -->
@@ -797,7 +800,7 @@
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
-    <script src="script.js?v=1.9" defer></script>
+    <script src="script.js?v=2.0" defer></script>
     <script>
     // Imagens por cor para o produto LED (sobrescreve script.js)
     const LED_IMAGES = {
@@ -823,6 +826,9 @@
         window.handleCheckout = function() {
             const activeLight = document.querySelector('.variant-btn.active[data-value]');
             if (activeLight) window.currentSelectedLight = activeLight.getAttribute('data-value');
+            if (typeof gtag === 'function') {
+                gtag('event', 'add_to_cart', { currency: 'BRL', value: window.currentSelectedPrice, items: [{ item_id: 'solare-luminaria-led', item_name: 'Luminária LED Sem Fio Solare', price: window.currentSelectedPrice, quantity: 1, google_business_vertical: 'retail' }] });
+            }
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'AddToCart', {
                     content_name: 'Luminária LED Sem Fio Solare',

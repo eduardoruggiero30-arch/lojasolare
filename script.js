@@ -76,6 +76,9 @@ window.handleCheckout = function() {
         currentSelectedLight = activeLight.getAttribute('data-value');
     }
 
+    if (typeof gtag === 'function') {
+        gtag('event', 'add_to_cart', { currency: 'BRL', value: currentSelectedPrice, items: [{ item_id: 'solare-luminaria', item_name: 'Luminária Solar Solare', price: currentSelectedPrice, quantity: 1, google_business_vertical: 'retail' }] });
+    }
     if (typeof fbq !== 'undefined') {
         fbq('track', 'AddToCart', {
             content_name: 'Luminária Solar Solare',
