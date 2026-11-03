@@ -2369,3 +2369,16 @@ footer {
         height: auto !important;
     }
 }
+
+/* Desktop/tablet: duas colunas equilibradas na seção de compra (mobile ≤768px não é afetado) */
+@media (min-width: 769px) {
+    .buy-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 48px;
+    }
+
+    .buy-gallery,
+    .buy-options {
+        min-width: 0;
+    }
+}
