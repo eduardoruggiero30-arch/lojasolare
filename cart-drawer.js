@@ -3,7 +3,8 @@
 // Uso: window.openCartDrawer(params) com os mesmos parâmetros que iam para o checkout
 // (qty, price, oldPrice, light).
 (function () {
-    // Preço do adicional — precisa bater com o bump "luminaria" de checkout.html e api/process-payment.js
+    // Adicional do carrinho ("carrinho") — separado do order bump "luminaria" do checkout; os dois somam.
+    // Preço precisa bater com BUMP_PRICES de checkout.html e api/process-payment.js
     var OFFER = { name: 'Leve +2 luminárias solar', desc: 'Mais 2 unidades com desconto exclusivo', price: 49.90 };
 
     function productImg(light) {
@@ -203,7 +204,7 @@
 
     function goToCheckout() {
         var params = new URLSearchParams(state.params);
-        if (state.selected) params.set('bumps', 'luminaria');
+        if (state.selected) params.set('bumps', 'carrinho');
         window.location.href = 'checkout.html?' + params.toString();
     }
 

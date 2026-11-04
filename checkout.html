@@ -1254,8 +1254,15 @@
         el.querySelector('.bump-desc').textContent = BUMP_CONFIG.desc;
         el.querySelector('.bump-price').textContent = '+ R$ ' + BUMP_CONFIG.price.toFixed(2).replace('.', ',');
     })();
-    const BUMP_PRICES = { luminaria: BUMP_CONFIG.price, envio: 9.90 };
-    let selectedBumps  = { luminaria: false, envio: false };
+    // carrinho = "Leve +2" escolhido no carrinho lateral (fixo, sem card aqui); soma com o bump luminaria
+    const CART_EXTRA = { price: 49.90, units: 2 };
+    const BUMP_PRICES = { luminaria: BUMP_CONFIG.price, carrinho: CART_EXTRA.price, envio: 9.90 };
+    let selectedBumps  = { luminaria: false, carrinho: false, envio: false };
+
+    // Unidades extras a enviar: carrinho (+2) + order bump (+2, ou +3 no LED)
+    function getExtraUnits() {
+        return (selectedBumps.carrinho ? CART_EXTRA.units : 0) + (selectedBumps.luminaria ? BUMP_CONFIG.units : 0);
+    }
 
     function getBumpTotal() {
         return Object.entries(selectedBumps)
@@ -1286,7 +1293,7 @@
         const shipTxt   = selectedShippingPrice === 0 ? 'Grátis' : fmt(selectedShippingPrice);
 
         // Variant label — soma as unidades do adicional "Leve +N"
-        const extraUnits = selectedBumps.luminaria ? BUMP_CONFIG.units : 0;
+        const extraUnits = getExtraUnits();
         const unitsTxt   = extraUnits ? `${qty + extraUnits} unid. (${qty} + ${extraUnits} adicionais)` : `${qty} unid.`;
         document.getElementById('sum-variant').textContent = `${unitsTxt} — ${light === 'warm' ? 'Luz Quente' : 'Luz Branca'}`;
         const sumBumpsRow = document.getElementById('sum-bumps-row');
@@ -1320,7 +1327,8 @@
     updateTotalDisplay();
     // Adicionais escolhidos no carrinho lateral chegam marcados
     (urlParams.get('bumps') || '').split(',').forEach(function (key) {
-        if (key in selectedBumps && !selectedBumps[key]) toggleBump(key);
+        if (key === 'carrinho') { selectedBumps.carrinho = true; updateTotalDisplay(); }
+        else if (key in selectedBumps && !selectedBumps[key]) toggleBump(key);
     });
     if (productType === 'led') {
         document.getElementById('sum-img').src = 'https://lojaskazamestra.com.br/cdn/shop/files/luminariaLedPilhasPrincipal05_800x.jpg';

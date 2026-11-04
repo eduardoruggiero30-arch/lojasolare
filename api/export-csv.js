@@ -65,13 +65,13 @@ function fmtProduct(addr) {
   } catch { return ''; }
 }
 
-// Unidades extras do bump "Leve +N" (luminaria): +3 no LED, +2 nos demais
+// Unidades extras: "Leve +2" do carrinho + bump luminaria do checkout (+3 no LED, +2 nos demais)
 function bumpUnits(addr) {
   if (!addr) return 0;
   try {
     const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
-    if (!a.orderBumps || a.orderBumps.luminaria !== true) return 0;
-    return a.productType === 'led' ? 3 : 2;
+    const b = a.orderBumps || {};
+    return (b.carrinho === true ? 2 : 0) + (b.luminaria === true ? (a.productType === 'led' ? 3 : 2) : 0);
   } catch { return 0; }
 }
 

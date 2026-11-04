@@ -502,12 +502,12 @@
     return PRODUCT_LABELS[a.productType] || (a.upsell ? 'Upsell' : '—');
   }
 
-  // Unidades a enviar: kit + "Leve +N" (bump luminaria: +3 no LED, +2 nos demais)
+  // Unidades a enviar: kit + "Leve +2" do carrinho + bump luminaria do checkout (+3 no LED, +2 nos demais)
   function bumpUnits(addr) {
     if (!addr) return 0;
     const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
-    if (!a.orderBumps || a.orderBumps.luminaria !== true) return 0;
-    return a.productType === 'led' ? 3 : 2;
+    const b = a.orderBumps || {};
+    return (b.carrinho === true ? 2 : 0) + (b.luminaria === true ? (a.productType === 'led' ? 3 : 2) : 0);
   }
 
   function qtyCell(o) {
