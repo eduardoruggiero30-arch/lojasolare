@@ -78,11 +78,11 @@
     #sc-cart .sc-pix { color: #388E3C; font-weight: 600; font-size: 13px; }
     #sc-cart .sc-promo {
         display: flex; align-items: center; gap: 10px; background: #fff7e0; border: 1px solid #fcd34d;
-        color: #78350f; border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.35; margin-bottom: 12px;
+        color: #78350f; border-radius: 8px; padding: 6px 10px; font-size: 12px; line-height: 1.3; margin-top: 8px; gap: 6px;
     }
     #sc-cart .sc-promo strong { color: #1A3C34; }
     #sc-cart .sc-promo.on { background: #f0faf0; border-color: #86efac; color: #166534; }
-    #sc-cart .sc-promo-icon { font-size: 20px; flex-shrink: 0; }
+    #sc-cart .sc-promo-icon { font-size: 14px; flex-shrink: 0; }
     #sc-cart .sc-buy {
         display: block; width: 100%; max-width: 620px; margin: 12px auto 0; border: none; cursor: pointer;
         background: #1A3C34; color: #fff; font-family: inherit; font-size: 17px; font-weight: 800; letter-spacing: .5px;
@@ -130,10 +130,6 @@
                 </section>
                 <section class="sc-card">
                     <h3 class="sc-title"><i class="fas fa-gift"></i> Aproveite e adicione ao pedido</h3>
-                    <div class="sc-promo" id="sc-promo">
-                        <span class="sc-promo-icon" id="sc-promo-icon">🎁</span>
-                        <span id="sc-promo-text"></span>
-                    </div>
                     <div class="sc-offer" id="sc-offer">
                         <div class="sc-check">✓</div>
                         <img class="sc-offer-img" id="sc-offer-img" src="" alt="">
@@ -143,6 +139,10 @@
                             <div class="sc-offer-desc">${OFFER.desc}</div>
                         </div>
                         <div class="sc-offer-price">+ ${fmt(OFFER.price)}</div>
+                    </div>
+                    <div class="sc-promo" id="sc-promo">
+                        <span class="sc-promo-icon" id="sc-promo-icon">🎁</span>
+                        <span id="sc-promo-text"></span>
                     </div>
                 </section>
             </div>
@@ -199,8 +199,8 @@
         $('sc-promo').classList.toggle('on', state.selected);
         $('sc-promo-icon').textContent = state.selected ? '✅' : '🎁';
         $('sc-promo-text').innerHTML = state.selected
-            ? '<strong>Desconto liberado!</strong> Você ganhou <strong>5% de desconto no Pix</strong> e <strong>Frete grátis HOJE</strong>.'
-            : 'Se levar o produto complementar ganhará <strong>5% de desconto no Pix</strong> e <strong>Frete grátis HOJE</strong>.';
+            ? '<span><strong>Liberado:</strong> 5% OFF no Pix + Frete grátis HOJE</span>'
+            : '<span>Levando junto: <strong>5% OFF no Pix</strong> + <strong>Frete grátis HOJE</strong></span>';
     }
 
     function goToCheckout() {
