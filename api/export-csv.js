@@ -65,13 +65,15 @@ function fmtProduct(addr) {
   } catch { return ''; }
 }
 
-// Unidades extras: "Leve +2" do carrinho + bump luminaria do checkout (+3 no LED, +2 nos demais)
+// Unidades extras: "Leve +2" do carrinho + bump luminaria do checkout (unidades gravadas no pedido)
 function bumpUnits(addr) {
   if (!addr) return 0;
   try {
     const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
     const b = a.orderBumps || {};
-    return (b.carrinho === true ? 2 : 0) + (b.luminaria === true ? (a.productType === 'led' ? 3 : 2) : 0);
+    // bumpUnits é gravado pelo servidor; pedidos antigos (sem ele) tinham o bump luminaria = +2 (+3 no LED)
+    const u = a.bumpUnits || { carrinho: 2, luminaria: a.productType === 'led' ? 3 : 2 };
+    return (b.carrinho === true ? u.carrinho : 0) + (b.luminaria === true ? u.luminaria : 0);
   } catch { return 0; }
 }
 

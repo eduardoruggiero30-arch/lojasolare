@@ -1007,10 +1007,10 @@
                         <div class="bump-check"><i class="fas fa-check"></i></div>
                         <div class="bump-content">
                             <span class="bump-badge">MAIS VENDIDO</span>
-                            <div class="bump-name">Leve +2 Luminárias Solares</div>
-                            <div class="bump-desc">Leve mais 2 unidades com desconto exclusivo</div>
+                            <div class="bump-name">Leve +1 Luminária Solar</div>
+                            <div class="bump-desc">Leve mais 1 unidade com desconto exclusivo</div>
                         </div>
-                        <div class="bump-price">+ R$ 49,90</div>
+                        <div class="bump-price">+ R$ 24,90</div>
                     </div>
                     <div class="order-bump" id="bump-envio" onclick="toggleBump('envio')">
                         <div class="bump-check"><i class="fas fa-check"></i></div>
@@ -1245,7 +1245,7 @@
     // ── ORDER BUMPS ───────────────────────────────────────
     const BUMP_CONFIG = productType === 'led'
         ? { name: 'Leve +3 Luminárias LED', desc: 'Leve mais 3 unidades com desconto exclusivo', price: 59.90, units: 3 }
-        : { name: 'Leve +2 Luminárias Solares', desc: 'Leve mais 2 unidades com desconto exclusivo', price: 49.90, units: 2 };
+        : { name: 'Leve +1 Luminária Solar', desc: 'Leve mais 1 unidade com desconto exclusivo', price: 24.90, units: 1 };
     // Atualiza o HTML do bump conforme o produto
     (function() {
         const el = document.getElementById('bump-luminaria');
@@ -1259,7 +1259,7 @@
     const BUMP_PRICES = { luminaria: BUMP_CONFIG.price, carrinho: CART_EXTRA.price, envio: 9.90 };
     let selectedBumps  = { luminaria: false, carrinho: false, envio: false };
 
-    // Unidades extras a enviar: carrinho (+2) + order bump (+2, ou +3 no LED)
+    // Unidades extras a enviar: carrinho (+2) + order bump (+1, ou +3 no LED)
     function getExtraUnits() {
         return (selectedBumps.carrinho ? CART_EXTRA.units : 0) + (selectedBumps.luminaria ? BUMP_CONFIG.units : 0);
     }
