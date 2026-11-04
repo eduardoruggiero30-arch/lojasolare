@@ -198,7 +198,7 @@
         $('sc-promo-icon').textContent = state.selected ? '✅' : '🎁';
         $('sc-promo-text').innerHTML = state.selected
             ? '<span><strong>Liberado:</strong> 5% OFF no Pix + Frete grátis HOJE</span>'
-            : '<span>Levando junto: <strong>5% OFF no Pix</strong> + <strong>Frete grátis HOJE</strong></span>';
+            : '<span>Leve +2 por R$ 49,90 e ganhe <strong>5% OFF no Pix</strong> + <strong>Frete grátis HOJE</strong></span>';
     }
 
     function goToCheckout() {
