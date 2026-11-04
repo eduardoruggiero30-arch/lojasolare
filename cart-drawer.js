@@ -78,7 +78,7 @@
     #sc-cart .sc-pix { color: #388E3C; font-weight: 600; font-size: 13px; }
     #sc-cart .sc-promo {
         display: flex; align-items: center; gap: 10px; background: #fff7e0; border: 1px solid #fcd34d;
-        color: #78350f; border-radius: 8px; padding: 6px 10px; font-size: 12px; line-height: 1.3; margin-top: 8px; gap: 6px;
+        color: #78350f; border-radius: 8px; padding: 6px 10px; font-size: 12px; line-height: 1.3; margin-bottom: 8px; gap: 6px;
     }
     #sc-cart .sc-promo strong { color: #1A3C34; }
     #sc-cart .sc-promo.on { background: #f0faf0; border-color: #86efac; color: #166534; }
@@ -89,6 +89,9 @@
         padding: 16px; border-radius: 12px; box-shadow: 0 6px 18px rgba(26,60,52,.25); transition: background .2s;
     }
     #sc-cart .sc-buy:hover { background: #24524a; }
+    #sc-cart .sc-free { font-size: 12px; font-weight: 600; color: #388E3C; }
+    #sc-cart .sc-row.sc-total { border-top: none; padding-top: 0; margin-top: 0; }
+    #sc-cart .sc-foot { padding: 10px 16px 12px; }
     #sc-cart .sc-secure { text-align: center; font-size: 12px; color: #6b7280; margin-top: 8px; }
 
     @media (max-width: 480px) {
@@ -102,7 +105,8 @@
         #sc-cart .sc-offer-price { grid-column: 3; font-size: 15px; }
         #sc-cart .sc-rows { gap: 4px; font-size: 13px; }
         #sc-cart .sc-row.sc-total { font-size: 17px; }
-        #sc-cart .sc-buy { padding: 14px; margin-top: 10px; }
+        #sc-cart .sc-buy { padding: 13px; margin-top: 8px; }
+        #sc-cart .sc-secure { margin-top: 5px; font-size: 11px; }
         #sc-cart .sc-item img { width: 60px; height: 60px; }
     }`;
 
@@ -130,6 +134,10 @@
                 </section>
                 <section class="sc-card">
                     <h3 class="sc-title"><i class="fas fa-gift"></i> Aproveite e adicione ao pedido</h3>
+                    <div class="sc-promo" id="sc-promo">
+                        <span class="sc-promo-icon" id="sc-promo-icon">🎁</span>
+                        <span id="sc-promo-text"></span>
+                    </div>
                     <div class="sc-offer" id="sc-offer">
                         <div class="sc-check">✓</div>
                         <img class="sc-offer-img" id="sc-offer-img" src="" alt="">
@@ -140,19 +148,12 @@
                         </div>
                         <div class="sc-offer-price">+ ${fmt(OFFER.price)}</div>
                     </div>
-                    <div class="sc-promo" id="sc-promo">
-                        <span class="sc-promo-icon" id="sc-promo-icon">🎁</span>
-                        <span id="sc-promo-text"></span>
-                    </div>
                 </section>
             </div>
         </div>
         <div class="sc-foot">
             <div class="sc-rows">
-                <div class="sc-row"><span class="sc-muted">Produtos</span><span id="sc-sub"></span></div>
-                <div class="sc-row" id="sc-extras-row" style="display:none;"><span class="sc-muted">Adicionais</span><span id="sc-extras"></span></div>
-                <div class="sc-row"><span class="sc-muted">Frete</span><span style="color:#388E3C;font-weight:600;">Grátis</span></div>
-                <div class="sc-row sc-total"><span>Total</span><span id="sc-total"></span></div>
+                <div class="sc-row sc-total"><span>Total <small class="sc-free">· Frete grátis</small></span><span id="sc-total"></span></div>
                 <div class="sc-row sc-pix"><span>⚡ No Pix com 5% OFF</span><span id="sc-pix"></span></div>
             </div>
             <button class="sc-buy" type="button">COMPRAR AGORA</button>
@@ -190,9 +191,6 @@
     function render() {
         var extras = state.selected ? OFFER.price : 0;
         $('sc-offer').classList.toggle('selected', state.selected);
-        $('sc-sub').textContent = fmt(state.price);
-        $('sc-extras-row').style.display = extras > 0 ? 'flex' : 'none';
-        $('sc-extras').textContent = fmt(extras);
         $('sc-total').textContent = fmt(state.price + extras);
         // Mesma conta do checkout e do servidor: 5% sobre o kit no Pix, adicional pelo valor cheio
         $('sc-pix').textContent = fmt(Math.round((state.price * 0.95 + extras) * 100) / 100);
