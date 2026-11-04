@@ -502,6 +502,21 @@
     return PRODUCT_LABELS[a.productType] || (a.upsell ? 'Upsell' : '—');
   }
 
+  // Unidades a enviar: kit + "Leve +N" (bump luminaria: +3 no LED, +2 nos demais)
+  function bumpUnits(addr) {
+    if (!addr) return 0;
+    const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
+    if (!a.orderBumps || a.orderBumps.luminaria !== true) return 0;
+    return a.productType === 'led' ? 3 : 2;
+  }
+
+  function qtyCell(o) {
+    const extra = bumpUnits(o.customer_address);
+    if (!o.product_quantity) return '—';
+    if (!extra) return o.product_quantity;
+    return `${o.product_quantity + extra}<div style="font-size:11px;font-weight:500;color:#16a34a;white-space:nowrap">${o.product_quantity} + ${extra} adicionais</div>`;
+  }
+
   function renderKpis(s, hasFilters) {
     const periodoLabel = s.periodo_label || 'Hoje';
 
@@ -608,7 +623,7 @@
         <td class="nowrap">${esc(o.customer_phone || '—')}</td>
         <td style="font-size:12px;line-height:1.6">${fmtAddress(o.customer_address)}</td>
         <td style="font-size:12px;font-weight:600">${esc(productLabel(o.customer_address))}</td>
-        <td style="text-align:center;font-weight:700">${o.product_quantity || '—'}</td>
+        <td style="text-align:center;font-weight:700">${qtyCell(o)}</td>
         <td style="font-size:12px">${esc(o.product_light_color || '—')}</td>
         <td class="nowrap price">${fmt(o.total_price)}</td>
         <td class="nowrap" style="font-size:12px">${o.shipping_method ? esc(o.shipping_method) + (o.shipping_price ? '<br>' + fmt(o.shipping_price) : '') : '—'}</td>

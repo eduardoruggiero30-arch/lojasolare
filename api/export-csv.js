@@ -65,6 +65,16 @@ function fmtProduct(addr) {
   } catch { return ''; }
 }
 
+// Unidades extras do bump "Leve +N" (luminaria): +3 no LED, +2 nos demais
+function bumpUnits(addr) {
+  if (!addr) return 0;
+  try {
+    const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
+    if (!a.orderBumps || a.orderBumps.luminaria !== true) return 0;
+    return a.productType === 'led' ? 3 : 2;
+  } catch { return 0; }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -110,7 +120,7 @@ export default async function handler(req, res) {
       o.customer_phone || '',
       fmtAddress(o.customer_address),
       fmtProduct(o.customer_address),
-      o.product_quantity || '',
+      o.product_quantity ? o.product_quantity + bumpUnits(o.customer_address) : '',
       o.product_light_color || '',
       fmtPrice(o.total_price),
       o.shipping_method || '',
