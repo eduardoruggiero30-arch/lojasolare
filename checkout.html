@@ -1114,6 +1114,10 @@
                         <span>Subtotal</span>
                         <span id="sum-subtotal">R$ 8,00</span>
                     </div>
+                    <div class="summary-row" id="sum-bumps-row" style="display:none;">
+                        <span id="sum-bumps-label">Adicional</span>
+                        <span id="sum-bumps">—</span>
+                    </div>
                     <div class="summary-row">
                         <span>Frete</span>
                         <span id="sum-shipping">Grátis</span>
@@ -1240,8 +1244,8 @@
 
     // ── ORDER BUMPS ───────────────────────────────────────
     const BUMP_CONFIG = productType === 'led'
-        ? { name: 'Leve +3 Luminárias LED', desc: 'Leve mais 3 unidades com desconto exclusivo', price: 59.90 }
-        : { name: 'Leve +2 Luminárias Solares', desc: 'Leve mais 2 unidades com desconto exclusivo', price: 49.90 };
+        ? { name: 'Leve +3 Luminárias LED', desc: 'Leve mais 3 unidades com desconto exclusivo', price: 59.90, units: 3 }
+        : { name: 'Leve +2 Luminárias Solares', desc: 'Leve mais 2 unidades com desconto exclusivo', price: 49.90, units: 2 };
     // Atualiza o HTML do bump conforme o produto
     (function() {
         const el = document.getElementById('bump-luminaria');
@@ -1281,8 +1285,16 @@
         const pixTotal  = baseTotal * 0.95 + bumpTotal;
         const shipTxt   = selectedShippingPrice === 0 ? 'Grátis' : fmt(selectedShippingPrice);
 
-        // Variant label
-        document.getElementById('sum-variant').textContent = `${qty} unid. — ${light === 'warm' ? 'Luz Quente' : 'Luz Branca'}`;
+        // Variant label — soma as unidades do adicional "Leve +N"
+        const extraUnits = selectedBumps.luminaria ? BUMP_CONFIG.units : 0;
+        const unitsTxt   = extraUnits ? `${qty + extraUnits} unid. (${qty} + ${extraUnits} adicionais)` : `${qty} unid.`;
+        document.getElementById('sum-variant').textContent = `${unitsTxt} — ${light === 'warm' ? 'Luz Quente' : 'Luz Branca'}`;
+        const sumBumpsRow = document.getElementById('sum-bumps-row');
+        if (sumBumpsRow) sumBumpsRow.style.display = bumpTotal > 0 ? 'flex' : 'none';
+        const sumBumpsEl = document.getElementById('sum-bumps');
+        if (sumBumpsEl) sumBumpsEl.textContent = fmt(bumpTotal);
+        const sumBumpsLabel = document.getElementById('sum-bumps-label');
+        if (sumBumpsLabel) sumBumpsLabel.textContent = extraUnits && !selectedBumps.envio ? `+${extraUnits} unidades` : 'Adicionais';
 
         // Sidebar summary
         document.getElementById('sum-subtotal').textContent = fmt(sub);
