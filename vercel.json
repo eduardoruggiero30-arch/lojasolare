@@ -1,4 +1,8 @@
 {
+  "rewrites": [
+    { "source": "/api/track", "destination": "/api/dashboard-data?live=track" },
+    { "source": "/api/live-data", "destination": "/api/dashboard-data?live=data" }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

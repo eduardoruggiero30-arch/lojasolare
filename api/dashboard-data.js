@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
+import { handleTrack } from '../lib/live-track.js';
+import { handleLiveData } from '../lib/live-data.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -8,6 +10,11 @@ const supabase = createClient(
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'solare@2024';
 
 export default async function handler(req, res) {
+  // Painel Ao vivo: /api/track e /api/live-data são reescritas para cá (vercel.json),
+  // porque o plano Hobby da Vercel não aceita mais de 12 funções.
+  if (req.query.live === 'track') return handleTrack(req, res);
+  if (req.query.live === 'data') return handleLiveData(req, res);
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
