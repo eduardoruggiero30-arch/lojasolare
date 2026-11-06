@@ -213,6 +213,8 @@
         $('sc-cart').setAttribute('aria-hidden', 'true');
         $('sc-cart-overlay').classList.remove('open');
         document.body.style.overflow = '';
+        // Painel Ao vivo: volta a contar como "na página do produto"
+        if (typeof window.liveStage === 'function') window.liveStage();
     }
 
     window.openCartDrawer = function (params) {
@@ -242,5 +244,7 @@
         $('sc-cart-overlay').classList.add('open');
         document.body.style.overflow = 'hidden';
         document.querySelector('#sc-cart .sc-close').focus();
+        // Painel Ao vivo: conta como "no carrinho"
+        if (typeof window.liveStage === 'function') window.liveStage('carrinho');
     };
 })();

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Solare — Ao vivo</title>
+<style>
+  :root {
+    --bg: #f0f4f1; --surface: #fff; --border: #e2e8e4; --text: #1a2e1e; --muted: #6b8072;
+    --primary: #16a34a; --primary-dark: #1a3c34; --primary-light: #dcfce7;
+    --radius: 14px; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.07);
+    --s-produto: #16a34a; --s-carrinho: #f59e0b; --s-checkout: #2563eb; --s-pix: #0d9488; --s-pos: #9333ea; --s-outras: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .topbar { background: var(--primary-dark); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; }
+  .brand-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .badge { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,.1); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: rgba(255,255,255,.85); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #f87171; animation: blink 1.4s infinite; }
+  .dot.ok { background: #4ade80; }
+  @keyframes blink { 0%,100% { opacity: 1 } 50% { opacity: .3 } }
+  .btn { font-size: 13px; color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); padding: 6px 14px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 500; white-space: nowrap; }
+
+  .main { padding: 24px; max-width: 1440px; margin: 0 auto; }
+  .hero { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .hero-num { font-size: 56px; font-weight: 800; color: var(--primary-dark); line-height: 1; }
+  .hero-label { font-size: 16px; color: var(--muted); font-weight: 600; }
+
+  .stages { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .stage-card { border-top: 4px solid var(--c); }
+  .stage-card .lbl { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  .stage-card .val { font-size: 34px; font-weight: 800; color: var(--c); margin-top: 6px; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; margin-bottom: 18px; }
+  .card h3 { font-size: 14px; font-weight: 700; color: var(--primary-dark); margin-bottom: 12px; }
+  .map-wrap { position: relative; }
+  #map { width: 100%; height: auto; display: block; max-height: 640px; }
+  #map .uf { fill: #e7efe9; stroke: #fff; stroke-width: 1.5; }
+  #map .pin { fill: rgba(22,163,74,.85); stroke: #fff; stroke-width: 1.5; }
+  #map .pulse { fill: rgba(22,163,74,.35); transform-box: fill-box; transform-origin: center; animation: ping 1.8s ease-out infinite; }
+  @keyframes ping { 0% { transform: scale(1); opacity: .9 } 100% { transform: scale(2.6); opacity: 0 } }
+  #map .pin-label { font-size: 13px; font-weight: 700; fill: var(--primary-dark); paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+
+  .list { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; padding: 7px 10px; border-radius: 8px; background: #f7faf8; }
+  .row b { color: var(--primary-dark); }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 2px; }
+
+  .bars { display: flex; flex-direction: column; gap: 8px; }
+  .bar { font-size: 13px; }
+  .bar-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .bar-track { height: 8px; background: #edf2ee; border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--primary); border-radius: 6px; transition: width .4s; }
+
+  .today { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .kpi .lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .kpi .val { font-size: 24px; font-weight: 800; color: var(--primary-dark); margin-top: 4px; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 6px 0 10px; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+
+  /* Login */
+  #login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(145deg, #0d2118, #1a3c34 50%, #14532d); }
+  .login-box { background: #fff; border-radius: 18px; padding: 32px 24px; width: 100%; max-width: 360px; text-align: center; }
+  .login-box h1 { font-size: 20px; color: var(--primary-dark); margin-bottom: 16px; }
+  .login-box input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; margin-bottom: 10px; }
+  .login-box button { width: 100%; padding: 12px; border: 0; border-radius: 10px; background: var(--primary-dark); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; }
+  .login-err { color: #dc2626; font-size: 13px; min-height: 18px; margin-top: 8px; }
+
+  @media (max-width: 1000px) {
+    .grid, .grid2 { grid-template-columns: minmax(0, 1fr); }
+    .today { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .main { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+    .stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stages .stage-card:first-child { grid-column: span 2; }
+    .today { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-num { font-size: 44px; }
+    .stage-card .val { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="login" style="display:none">
+  <form class="login-box" onsubmit="doLogin(event)">
+    <h1>🔴 Solare — Ao vivo</h1>
+    <input type="password" id="pwd" placeholder="Senha do dashboard" autocomplete="current-password">
+    <button type="submit">Entrar</button>
+    <div class="login-err" id="login-err"></div>
+  </form>
+</div>
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div class="brand"><div class="brand-icon">☀</div> Solare — Ao vivo</div>
+    <div class="top-right">
+      <div class="badge"><span class="dot" id="live-dot"></span><span id="updated">conectando…</span></div>
+      <a class="btn" href="dashboard.html">← Dashboard</a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="hero">
+      <div class="hero-num" id="live-total">0</div>
+      <div class="hero-label">visitantes no site agora</div>
+    </div>
+
+    <div class="stages">
+      <div class="card stage-card" style="--c:var(--s-produto)"><div class="lbl">Na página do produto</div><div class="val" id="st-produto">0</div></div>
+      <div class="card stage-card" style="--c:var(--s-carrinho)"><div class="lbl">No carrinho</div><div class="val" id="st-carrinho">0</div></div>
+      <div class="card stage-card" style="--c:var(--s-checkout)"><div class="lbl">No checkout</div><div class="val" id="st-checkout">0</div></div>
+      <div class="card stage-card" style="--c:var(--s-pix)"><div class="lbl">Na tela do Pix</div><div class="val" id="st-pix">0</div></div>
+      <div class="card stage-card" style="--c:var(--s-pos)"><div class="lbl">Upsell / Obrigado</div><div class="val" id="st-pos">0</div></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Onde estão agora</h3>
+        <div class="map-wrap"><svg id="map" role="img" aria-label="Mapa do Brasil com visitantes ao vivo"></svg></div>
+        <div class="legend"><span><i style="background:var(--primary)"></i>Cada ponto é uma cidade com gente no site — o número é quantos visitantes</span></div>
+      </div>
+      <div class="card">
+        <h3>Cidades agora</h3>
+        <div class="list" id="cities"></div>
+        <h3 style="margin-top:18px">Outras páginas (institucionais, rastreio)</h3>
+        <div class="row"><span>Visitantes</span><b id="st-outras">0</b></div>
+      </div>
+    </div>
+
+    <div class="section-title">Hoje (desde 00:00)</div>
+    <div class="today">
+      <div class="card kpi"><div class="lbl">Visitas</div><div class="val" id="t-visits">0</div></div>
+      <div class="card kpi"><div class="lbl">Abriram o carrinho</div><div class="val" id="t-carrinho">0</div></div>
+      <div class="card kpi"><div class="lbl">Chegaram ao checkout</div><div class="val" id="t-checkout">0</div></div>
+      <div class="card kpi"><div class="lbl">Pix gerados</div><div class="val" id="t-pix">0</div></div>
+      <div class="card kpi"><div class="lbl">Vendas pagas</div><div class="val" id="t-vendas">0</div></div>
+      <div class="card kpi"><div class="lbl">Conversão</div><div class="val" id="t-conv">0%</div></div>
+    </div>
+    <div class="grid2" style="margin-bottom:18px">
+      <div class="card kpi"><div class="lbl">Faturamento pago hoje (com upsell)</div><div class="val" id="t-receita">R$ 0,00</div></div>
+      <div class="card kpi"><div class="lbl">Ticket médio</div><div class="val" id="t-ticket">—</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card"><h3>Origem das visitas de hoje</h3><div class="bars" id="sources"></div></div>
+      <div class="card"><h3>Aparelho das visitas de hoje</h3><div class="bars" id="devices"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="brasil-map.js"></script>
+<script>
+  var password = '';
+  var timer = null;
+  var SOURCE_LABELS = { facebook: 'Facebook', instagram: 'Instagram', google: 'Google', tiktok: 'TikTok', direto: 'Direto', outros: 'Outros', desconhecido: 'Desconhecido' };
+  var DEVICE_LABELS = { celular: 'Celular', computador: 'Computador', tablet: 'Tablet', desconhecido: 'Desconhecido' };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function brl(n) { return 'R$ ' + (Number(n) || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+  // ── Mapa ──
+  var M = window.BR_MAP;
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var map = $('map');
+  map.setAttribute('viewBox', '-24 -24 ' + (M.w + 48) + ' ' + (M.h + 48)); // folga para os pontos do litoral
+  M.states.forEach(function (s) {
+    var p = document.createElementNS(svgNS, 'path');
+    p.setAttribute('d', s.d); p.setAttribute('class', 'uf');
+    map.appendChild(p);
+  });
+  var pins = document.createElementNS(svgNS, 'g');
+  map.appendChild(pins);
+  function project(lat, lon) { return [(lon - M.lon0) * M.c * M.k, (M.lat0 - lat) * M.k]; }
+
+  function drawPins(cities) {
+    var html = '';
+    cities.forEach(function (c) {
+      if (c.lat == null || c.lon == null) return;
+      var xy = project(c.lat, c.lon);
+      if (xy[0] < 0 || xy[1] < 0 || xy[0] > M.w || xy[1] > M.h) return; // fora do Brasil
+      var r = Math.min(7 + Math.sqrt(c.count) * 4, 26);
+      html += '<g><title>' + esc((c.city || 'Cidade desconhecida') + (c.region ? ' - ' + c.region : '') + ': ' + c.count) + '</title>' +
+        '<circle class="pulse" cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + r + '"></circle>' +
+        '<circle class="pin" cx="' + xy[0] + '" cy="' + xy[1] + '" r="' + r + '"></circle>' +
+        (c.count > 1 ? '<text class="pin-label" x="' + xy[0] + '" y="' + (xy[1] + 4.5) + '" text-anchor="middle">' + c.count + '</text>' : '') +
+        '</g>';
+    });
+    pins.innerHTML = html;
+  }
+
+  function bars(el, data, labels) {
+    var entries = Object.keys(data).map(function (k) { return [k, data[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+    var total = entries.reduce(function (s, e) { return s + e[1]; }, 0);
+    if (!total) { el.innerHTML = '<div class="empty">Sem visitas ainda.</div>'; return; }
+    el.innerHTML = entries.map(function (e) {
+      var pct = Math.round(e[1] / total * 100);
+      return '<div class="bar"><div class="bar-top"><span>' + esc(labels[e[0]] || e[0]) + '</span><span><b>' + pct + '%</b> · ' + e[1] + '</span></div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+    }).join('');
+  }
+
+  function render(d) {
+    var L = d.live, T = d.today;
+    $('live-total').textContent = L.total;
+    ['produto', 'carrinho', 'checkout', 'pix', 'pos', 'outras'].forEach(function (s) { $('st-' + s).textContent = L.stages[s] || 0; });
+    drawPins(L.cities);
+    $('cities').innerHTML = L.cities.length
+      ? L.cities.map(function (c) { return '<div class="row"><span>' + esc(c.city || 'Cidade desconhecida') + (c.region ? ' - ' + esc(c.region) : '') + '</span><b>' + c.count + '</b></div>'; }).join('')
+      : '<div class="empty">Ninguém no site neste momento.</div>';
+
+    $('t-visits').textContent = T.visits;
+    $('t-carrinho').textContent = T.carrinho;
+    $('t-checkout').textContent = T.checkout;
+    $('t-pix').textContent = T.pixGerados;
+    $('t-vendas').textContent = T.vendas;
+    $('t-conv').textContent = String(T.conversao).replace('.', ',') + '%';
+    $('t-receita').textContent = brl(T.receita);
+    $('t-ticket').textContent = T.vendas ? brl(T.receita / T.vendas) : '—';
+    bars($('sources'), T.sources, SOURCE_LABELS);
+    bars($('devices'), T.devices, DEVICE_LABELS);
+
+    $('live-dot').classList.add('ok');
+    $('updated').textContent = 'ao vivo · ' + new Date(d.now).toLocaleTimeString('pt-BR');
+  }
+
+  async function load() {
+    try {
+      var res = await fetch('/api/live-data?password=' + encodeURIComponent(password), { cache: 'no-store' });
+      if (res.status === 401) { logout('Senha incorreta.'); return; }
+      if (!res.ok) throw new Error();
+      render(await res.json());
+    } catch (e) {
+      $('live-dot').classList.remove('ok');
+      $('updated').textContent = 'reconectando…';
+    }
+  }
+
+  function start() {
+    $('login').style.display = 'none';
+    $('app').style.display = 'block';
+    load();
+    clearInterval(timer);
+    timer = setInterval(load, 5000);
+  }
+
+  function logout(msg) {
+    clearInterval(timer);
+    try { sessionStorage.removeItem('dash_pwd'); } catch (e) {}
+    $('app').style.display = 'none';
+    $('login').style.display = 'flex';
+    $('login-err').textContent = msg || '';
+  }
+
+  function doLogin(e) {
+    e.preventDefault();
+    password = $('pwd').value.trim();
+    if (!password) return;
+    try { sessionStorage.setItem('dash_pwd', password); } catch (err) {}
+    start();
+  }
+
+  // Usa o mesmo login do dashboard (mesma aba)
+  try { password = sessionStorage.getItem('dash_pwd') || ''; } catch (e) {}
+  if (password) start(); else logout();
+</script>
+</body>
+</html>
