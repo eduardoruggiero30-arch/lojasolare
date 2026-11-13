@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Pagar Pix — Solare Luminárias</title>
+<style>
+  :root { --green-dark: #1A3C34; --green: #16a34a; --green-soft: #ecf7ef; --yellow: #f5c400; --text: #10251c; --muted: #4b6355; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #eef5ef; color: var(--text); min-height: 100vh; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 18px 16px 40px; }
+  .card { background: #fff; border-radius: 18px; overflow: hidden; border: 1px solid #d6eadb; box-shadow: 0 6px 24px rgba(26,60,52,.08); }
+  .logo { text-align: center; padding: 20px 16px 16px; }
+  .logo img { width: 140px; height: auto; }
+  .bar { display: flex; height: 5px; }
+  .bar span:first-child { flex: 82; background: var(--green-dark); }
+  .bar span:last-child { flex: 18; background: var(--yellow); }
+  .hero { background: var(--green-dark); color: #fff; text-align: center; padding: 22px 18px 24px; }
+  .hero h1 { font-size: 24px; line-height: 1.25; }
+  .hero p { margin-top: 6px; color: #bfe6cb; font-size: 16px; }
+  .amount { font-size: 34px; font-weight: 800; color: #fff; margin-top: 8px; }
+  .body { padding: 22px 18px 24px; }
+  .label { font-size: 16px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; }
+  .code { background: #f6fbf7; border: 2px dashed #86c49a; border-radius: 12px; padding: 14px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.5; word-break: break-all; user-select: all; -webkit-user-select: all; }
+  .copy { display: block; width: 100%; margin-top: 16px; border: 0; border-radius: 14px; background: var(--green); color: #fff; font-size: 21px; font-weight: 800; padding: 20px 16px; cursor: pointer; box-shadow: 0 6px 16px rgba(22,163,74,.3); font-family: inherit; }
+  .copy:active { transform: scale(.99); }
+  .copy.done { background: var(--green-dark); }
+  .copied { display: none; margin-top: 14px; background: var(--green-soft); border-left: 5px solid var(--green); border-radius: 10px; padding: 14px; font-size: 17px; font-weight: 700; color: #14532d; }
+  .steps { margin-top: 22px; display: grid; gap: 12px; }
+  .step { display: flex; gap: 12px; align-items: flex-start; font-size: 17px; line-height: 1.4; }
+  .step b.n { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--green); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .status { margin-top: 22px; text-align: center; font-size: 15px; color: var(--muted); }
+  .status .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--yellow); margin-right: 6px; animation: blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity: .3; } }
+  .paid { display: none; text-align: center; padding: 30px 18px; }
+  .paid .icon { width: 84px; height: 84px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 48px; line-height: 84px; margin: 0 auto 14px; }
+  .paid h2 { font-size: 26px; color: var(--green-dark); }
+  .paid p { margin-top: 8px; font-size: 17px; color: var(--muted); line-height: 1.5; }
+  .help { text-align: center; margin-top: 18px; font-size: 15px; color: var(--muted); }
+  .help a { color: var(--green); font-weight: 700; text-decoration: none; }
+  .error { display: none; text-align: center; padding: 26px 18px; font-size: 17px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="logo"><a href="/"><img src="logo-solare.png" alt="SOLARE"></a></div>
+    <div class="bar"><span></span><span></span></div>
+
+    <div id="pay">
+      <div class="hero">
+        <h1>Pague seu Pix</h1>
+        <p>Valor do seu pedido</p>
+        <div class="amount" id="amount"></div>
+      </div>
+      <div class="body">
+        <div class="label">Seu código Pix (copia e cola):</div>
+        <div class="code" id="code"></div>
+        <button class="copy" id="copy-btn" type="button">📋 Copiar código Pix</button>
+        <div class="copied" id="copied">✅ Código copiado! Agora é só colar no app do seu banco.</div>
+
+        <div class="steps">
+          <div class="step"><b class="n">1</b><span>Toque no botão verde <b>“Copiar código Pix”</b></span></div>
+          <div class="step"><b class="n">2</b><span>Abra o <b>app do seu banco</b> e escolha <b>Pix → Pix Copia e Cola</b></span></div>
+          <div class="step"><b class="n">3</b><span><b>Cole o código</b> e confirme o pagamento</span></div>
+        </div>
+
+        <div class="status" id="status"><span class="dot"></span>Aguardando pagamento…</div>
+      </div>
+    </div>
+
+    <div class="paid" id="paid">
+      <div class="icon">✓</div>
+      <h2>Pagamento confirmado!</h2>
+      <p>Muito obrigado pela confiança. Você vai receber a confirmação do pedido no seu e-mail.</p>
+    </div>
+
+    <div class="error" id="error">Não encontramos o código Pix neste link.<br>Fale com a gente no WhatsApp que ajudamos você a pagar.</div>
+  </div>
+  <p class="help">Precisa de ajuda? <a href="https://wa.me/5521975605337?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20para%20pagar%20meu%20Pix">WhatsApp (21) 97560-5337</a></p>
+</div>
+
+<script>
+  // Página aberta pelo e-mail de lembrete do Pix. Não dispara conversões de anúncio
+  // (isso fica na página de obrigado), só mostra o código e copia com um toque.
+  var params = new URLSearchParams(location.search);
+  var code = (params.get('c') || '').trim();
+  var paymentId = (params.get('id') || '').replace(/\D/g, '');
+  var value = parseFloat(params.get('v') || '0');
+
+  if (!code) {
+    document.getElementById('pay').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+  } else {
+    document.getElementById('code').textContent = code;
+    document.getElementById('amount').textContent = value > 0 ? 'R$ ' + value.toFixed(2).replace('.', ',') : '';
+  }
+
+  function copyFallback(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  // Último recurso: seleciona o código inteiro na tela para a pessoa só tocar em "Copiar"
+  function selectCode() {
+    var el = document.getElementById('code');
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    if (ok) { showCopied(); return; }
+    var msg = document.getElementById('copied');
+    msg.textContent = '👆 O código está selecionado. Toque em “Copiar” no menu que aparecer na tela.';
+    msg.style.display = 'block';
+  }
+
+  function showCopied() {
+    var btn = document.getElementById('copy-btn');
+    btn.classList.add('done');
+    btn.textContent = '✅ Código copiado!';
+    var msg = document.getElementById('copied');
+    msg.textContent = '✅ Código copiado! Agora é só colar no app do seu banco.';
+    msg.style.display = 'block';
+    setTimeout(function () { btn.classList.remove('done'); btn.textContent = '📋 Copiar código Pix'; }, 4000);
+  }
+
+  document.getElementById('copy-btn').addEventListener('click', function () {
+    if (!code) return;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(code).then(showCopied, function () { if (copyFallback(code)) showCopied(); else selectCode(); });
+    } else if (copyFallback(code)) {
+      showCopied();
+    } else {
+      selectCode();
+    }
+  });
+
+  // Mostra "Pagamento confirmado" assim que o Pix for pago
+  function checkPaid() {
+    if (!paymentId) return;
+    fetch('/api/check-payment-status?payment_id=' + paymentId, { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.status === 'approved') {
+          clearInterval(timer);
+          document.getElementById('pay').style.display = 'none';
+          document.getElementById('paid').style.display = 'block';
+        } else if (d && (d.status === 'cancelled' || d.status === 'expired')) {
+          clearInterval(timer);
+          document.getElementById('status').innerHTML = 'Este Pix venceu. <a href="/" style="color:#16a34a;font-weight:700;">Fazer um novo pedido</a>';
+        }
+      })
+      .catch(function () {});
+  }
+  var timer = paymentId ? setInterval(checkPaid, 5000) : null;
+  checkPaid();
+  if (!paymentId) document.getElementById('status').style.display = 'none';
+</script>
+<script src="live-tracker.js?v=1.1" defer></script>
+</body>
+</html>

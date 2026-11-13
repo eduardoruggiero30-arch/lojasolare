@@ -43,6 +43,7 @@
         // Etapa do funil a partir da página
         function pageStage() {
             if (/checkout/.test(path)) return 'checkout';
+            if (/pagar-pix/.test(path)) return 'pix';
             if (/obrigado/.test(path)) return (q.get('type') === 'pix' && q.get('status') === 'pending') ? 'pix' : 'pos';
             if (/upsell/.test(path)) return 'pos';
             if (path === '/' || /index|lampada-led|luminaria-led|promo-liquidacao|catalogo/.test(path)) return 'produto';
