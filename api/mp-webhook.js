@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { notifyPixExpired } from '../lib/send-notification.js';
-import { notifyOrderPaid } from '../lib/order-emails.js';
+import { notifyOrderPaid, notifyPixExpiredOnce } from '../lib/order-emails.js';
 import { sendMetaEvent } from '../lib/meta-capi.js';
 import { sendWhatsApp } from '../lib/whatsapp.js';
 import crypto from 'crypto';
@@ -160,10 +159,8 @@ export default async function handler(req, res) {
           eventId: `purchase-${paymentId}`,
         }).catch(e => console.error('Meta CAPI Purchase (webhook) failed:', e));
       } else if (newStatus === 'cancelled' && !isUpsellOrder) {
-        await notifyPixExpired({
-          customerName: order.customer_name,
-          customerEmail: order.customer_email,
-        });
+        // Pix venceu: convida a comprar de novo (uma vez; só Pix; não envia se já comprou)
+        await notifyPixExpiredOnce(order.id);
       }
     }
 
