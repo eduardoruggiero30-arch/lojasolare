@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { scheduleAbandonEmail } from '../lib/order-emails.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -39,6 +40,9 @@ export default async function handler(req, res) {
         last_seen: now,
       }).eq('phone', cleanPhone);
     }
+
+    // E-mail de checkout abandonado em 30 min (cancelado se gerar Pix ou pagar)
+    if (email) await scheduleAbandonEmail(cleanPhone);
 
     return res.status(200).json({ ok: true });
   } catch (err) {

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { notifyPaymentApproved } from '../lib/send-notification.js';
+import { notifyOrderPaid } from '../lib/order-emails.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -202,14 +202,7 @@ export default async function handler(req, res) {
 
     // Send notification for upsell approval
     if (mpResult.status === 'approved') {
-      await notifyPaymentApproved({
-        customerName: order.customer_name,
-        customerEmail: order.customer_email,
-        customerPhone: order.customer_phone,
-        totalPrice: upsellAmount,
-        shippingMethod: order.shipping_method,
-        orderId: savedUpsell?.id || `MP-${mpResult.id}`,
-      });
+      await notifyOrderPaid(savedUpsell?.id);
     }
 
     return res.status(200).json({

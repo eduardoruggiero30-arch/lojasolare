@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
-import { notifyPaymentApproved, schedulePostPurchaseEmails } from '../lib/send-notification.js';
+import { notifyOrderPaid, schedulePixReminders, cancelAbandonEmail } from '../lib/order-emails.js';
 import { sendMetaEvent } from '../lib/meta-capi.js';
 import { sendWhatsApp } from '../lib/whatsapp.js';
 import { isValidOrderTotal } from '../lib/order-pricing.js';
@@ -292,12 +292,6 @@ export default async function handler(req, res) {
       }).catch(e => console.error('Meta CAPI failed (non-fatal):', e));
     }
 
-    // Mark lead converted immediately on card approval so abandonment cron never fires
-    if (!isPix && paymentStatus === 'approved' && customerPhone) {
-      supabase.from('leads')
-        .update({ converted: true })
-        .eq('phone', String(customerPhone).replace(/\D/g, ''));
-    }
 
     // ── Emails pós-compra: apenas cartão aprovado
     if (!isPix && paymentStatus === 'approved') {
@@ -306,15 +300,16 @@ export default async function handler(req, res) {
         `Olá ${firstName}, seu pedido foi confirmado e logo sairá para entrega, lembrando que nosso prazo de entrega é de 8 dias`
       ).catch(() => {});
 
-      await notifyPaymentApproved({
-        customerName, customerEmail, customerPhone,
-        totalPrice, shippingMethod,
-        orderId: order?.id || mpResult.id,
-      });
-      schedulePostPurchaseEmails({
-        customerName, customerEmail,
-        orderId: order?.id || mpResult.id,
-      }).catch(e => console.error('Post-purchase emails failed (non-fatal):', e));
+      // Confirmação + oferta de upsell por e-mail (uma única vez por pedido)
+      await notifyOrderPaid(order?.id);
+    }
+
+    // ── Pix gerado: agenda os lembretes (4 e 10 min) e cancela o e-mail de checkout abandonado
+    if (isPix && order?.id) {
+      await Promise.all([
+        schedulePixReminders(order, mpResult.point_of_interaction?.transaction_data?.qr_code),
+        cancelAbandonEmail(customerPhone, customerEmail),
+      ]);
     }
 
     return res.status(200).json({

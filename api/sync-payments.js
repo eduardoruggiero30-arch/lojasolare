@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { notifyPaymentApproved, schedulePostPurchaseEmails } from '../lib/send-notification.js';
+import { notifyOrderPaid } from '../lib/order-emails.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -91,20 +91,7 @@ export default async function handler(req, res) {
 
           // Envia email de confirmação para pedidos aprovados
           if (newStatus === 'approved' && fullOrder) {
-            notifyPaymentApproved({
-              customerName:   fullOrder.customer_name,
-              customerEmail:  fullOrder.customer_email,
-              customerPhone:  fullOrder.customer_phone,
-              totalPrice:     fullOrder.total_price,
-              shippingMethod: fullOrder.shipping_method,
-              orderId:        fullOrder.id,
-            }).catch(e => console.error('[Sync] Email confirmação falhou:', e));
-
-            if (fullOrder.customer_address?.upsell !== true) schedulePostPurchaseEmails({
-              customerName:  fullOrder.customer_name,
-              customerEmail: fullOrder.customer_email,
-              orderId:       fullOrder.id,
-            }).catch(e => console.error('[Sync] Emails pós-compra falharam:', e));
+            await notifyOrderPaid(fullOrder.id);
           }
 
           results.push({ id: order.id, mp_payment_id: pid, old: 'pending', new: newStatus, error: upErr?.message || null });

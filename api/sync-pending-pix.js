@@ -8,7 +8,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { notifyPaymentApproved, schedulePostPurchaseEmails } from '../lib/send-notification.js';
+import { notifyOrderPaid } from '../lib/order-emails.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -64,21 +64,8 @@ export default async function handler(req, res) {
             .eq('id', order.id);
 
           // Envia email de confirmação
-          await notifyPaymentApproved({
-            customerName:   order.customer_name,
-            customerEmail:  order.customer_email,
-            customerPhone:  order.customer_phone,
-            totalPrice:     order.total_price,
-            shippingMethod: order.shipping_method,
-            orderId:        order.id,
-          }).catch(e => console.error('[SyncPix] notifyPaymentApproved failed:', e));
-
-          // Agenda emails pós-compra (3h e 2 dias) — não repete para venda adicional (upsell)
-          if (order.customer_address?.upsell !== true) await schedulePostPurchaseEmails({
-            customerName:  order.customer_name,
-            customerEmail: order.customer_email,
-            orderId:       order.id,
-          }).catch(e => console.error('[SyncPix] schedulePostPurchaseEmails failed:', e));
+          // Confirmação (+ upsell no pedido principal) — uma única vez por pedido
+          await notifyOrderPaid(order.id);
 
           confirmed++;
           console.log(`[SyncPix] Order ${order.id} confirmed and notified.`);

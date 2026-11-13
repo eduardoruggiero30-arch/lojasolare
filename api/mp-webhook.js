@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { notifyPaymentApproved, notifyPixExpired, schedulePostPurchaseEmails } from '../lib/send-notification.js';
+import { notifyPixExpired } from '../lib/send-notification.js';
+import { notifyOrderPaid } from '../lib/order-emails.js';
 import { sendMetaEvent } from '../lib/meta-capi.js';
 import { sendWhatsApp } from '../lib/whatsapp.js';
 import crypto from 'crypto';
@@ -118,13 +119,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ status: 'db_error' });
     }
 
-    // Mark lead as converted so abandonment message is not sent
-    if (order?.customer_phone) {
-      supabase.from('leads')
-        .update({ converted: true })
-        .eq('phone', String(order.customer_phone).replace(/\D/g, ''));
-    }
-
     // Send notifications based on status
     if (order) {
       // Venda adicional (upsell/downsell): o cliente já recebeu o WhatsApp e os
@@ -137,20 +131,8 @@ export default async function handler(req, res) {
           `Olá ${firstName}, seu pedido foi confirmado e logo sairá para entrega, lembrando que nosso prazo de entrega é de 8 dias`
         ).catch(() => {});
 
-        await notifyPaymentApproved({
-          customerName: order.customer_name,
-          customerEmail: order.customer_email,
-          customerPhone: order.customer_phone,
-          totalPrice: order.total_price,
-          shippingMethod: order.shipping_method,
-          orderId: order.id,
-        });
-
-        if (!isUpsellOrder) schedulePostPurchaseEmails({
-          customerName:  order.customer_name,
-          customerEmail: order.customer_email,
-          orderId:       order.id,
-        }).catch(e => console.error('Post-purchase emails (webhook) failed:', e));
+        // Confirmação (+ upsell no pedido principal) — envia uma única vez, mesmo com vários avisos do MP
+        await notifyOrderPaid(order.id);
 
         // Meta CAPI Purchase (especially important for Pix — browser pixel may not fire)
         const nameParts = (order.customer_name || '').trim().split(/\s+/);

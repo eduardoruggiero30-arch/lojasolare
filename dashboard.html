@@ -508,6 +508,7 @@
   function bumpUnits(addr) {
     if (!addr) return 0;
     const a = typeof addr === 'string' ? JSON.parse(addr) : addr;
+    if (a.upsell) return 0; // venda adicional copia os dados do pedido original, sem os adicionais dele
     const b = a.orderBumps || {};
     // bumpUnits é gravado pelo servidor; pedidos antigos (sem ele) tinham o bump luminaria = +2 (+3 no LED)
     const u = a.bumpUnits || { carrinho: 2, luminaria: a.productType === 'led' ? 3 : 2 };

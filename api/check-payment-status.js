@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { notifyPaymentApproved, cancelPixReminder, schedulePostPurchaseEmails } from '../lib/send-notification.js';
+import { cancelPixReminder } from '../lib/send-notification.js';
+import { notifyOrderPaid } from '../lib/order-emails.js';
 import { sendMetaEvent } from '../lib/meta-capi.js';
 
 const supabase = createClient(
@@ -57,21 +58,8 @@ export default async function handler(req, res) {
         if (reminder_2h_id) cancelPixReminder(reminder_2h_id).catch(() => {});
         if (reminder_4h_id) cancelPixReminder(reminder_4h_id).catch(() => {});
 
-        notifyPaymentApproved({
-          customerName:  order.customer_name,
-          customerEmail: order.customer_email,
-          customerPhone: order.customer_phone,
-          totalPrice:    order.total_price,
-          shippingMethod: order.shipping_method,
-          orderId:       order.id,
-        }).catch(e => console.error('Email notification failed:', e));
-
-        // Agendar emails pós-compra (3h e 2 dias) — não repete para venda adicional (upsell)
-        if (order.customer_address?.upsell !== true) schedulePostPurchaseEmails({
-          customerName:  order.customer_name,
-          customerEmail: order.customer_email,
-          orderId:       order.id,
-        }).catch(e => console.error('Post-purchase emails failed:', e));
+        // Confirmação (+ upsell no pedido principal) — uma única vez por pedido
+        await notifyOrderPaid(order.id);
       }
 
       return res.status(200).json({ status: 'approved' });
